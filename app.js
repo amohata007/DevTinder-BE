@@ -1,22 +1,36 @@
 const express = require("express");
+const { AdminData } = require("./Middlewares/admin.js");
 
 const app = express();
 
+//Middlewares
+app.use("/admin", AdminData);
+
+app.get("/admin/getAllUsers", (req, res) => {
+  console.log("Admin get all users");
+  res.send("Get all data");
+});
+
+app.delete("/admin/deleteUsers", (req, res) => {
+  console.log("Delete users");
+  res.send("Delete data");
+});
+
 //Multiple route handlers
-app.get(
-  "/user",
-  (req, res, next) => {
-    //This is Middleware //can have multiple middleware
-    console.log("Route1");
-    // res.send("Hello from route 1");
-    next();
-  },
-  (req, res) => {
-    //This is route handler
-    console.log("Route2");
-    res.send("Hello from route 2");
-  }
-);
+// app.get(
+//   "/user",
+//   (req, res, next) => {
+//     //This is Middleware //can have multiple middleware
+//     console.log("Route1");
+//     // res.send("Hello from route 1");
+//     next();
+//   },
+//   (req, res) => {
+//     //This is route handler
+//     console.log("Route2");
+//     res.send("Hello from route 2");
+//   }
+// );
 
 //Learning Dynamic Routes and Params
 // app.get("/user", (req, res) => {
