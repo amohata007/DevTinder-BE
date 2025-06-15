@@ -60,7 +60,9 @@ app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, data);
+    const user = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+    });
     res.send("Updated Successfully..!!");
   } catch (err) {
     res.status(400).send("Error while updating user: " + err.message);
@@ -72,7 +74,13 @@ app.patch("/userr", async (req, res) => {
   const findAge = req.body.age;
   const data = req.body;
   try {
-    const user = await User.updateMany({ age: findAge }, { $set: data });
+    const user = await User.updateMany(
+      { age: findAge },
+      { $set: data },
+      {
+        runValidators: true,
+      }
+    );
     res.send("Updated Successfully..!!");
   } catch (err) {
     res.status(400).send("Error while updating user: " + err.message);
