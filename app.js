@@ -3,11 +3,13 @@ const { connectDb } = require("./config/database.js");
 const User = require("./models/user.js");
 const validateFunction = require("./utils/validate.js");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
 //Converting into proper json format
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
@@ -44,6 +46,7 @@ app.post("/login", async (req, res) => {
     if (user) {
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (isValidPassword) {
+        res.cookie("token", "ashjdahsdlaskasdja;khsdjakhdkja");
         res.send("Login Successfull");
       } else {
         throw new Error("Invalid Credentials");
@@ -53,6 +56,17 @@ app.post("/login", async (req, res) => {
     }
   } catch (err) {
     res.status(400).send("Problem while Login in: " + err.message);
+  }
+});
+
+//Profile Get
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    console.log(cookies, "Cookie");
+    res.send("Reading Cookie");
+  } catch (err) {
+    res.status(400).send("Error while reading user: " + err.message);
   }
 });
 
