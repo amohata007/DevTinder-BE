@@ -4,6 +4,7 @@ const User = require("./models/user.js");
 const validateFunction = require("./utils/validate.js");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -46,7 +47,8 @@ app.post("/login", async (req, res) => {
     if (user) {
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (isValidPassword) {
-        res.cookie("token", "ashjdahsdlaskasdja;khsdjakhdkja");
+        const token = await jwt.sign({ _id: user._id }, "Namaste@123");
+        res.cookie("token", token);
         res.send("Login Successfull");
       } else {
         throw new Error("Invalid Credentials");
@@ -63,8 +65,15 @@ app.post("/login", async (req, res) => {
 app.get("/profile", async (req, res) => {
   try {
     const cookies = req.cookies;
-    console.log(cookies, "Cookie");
-    res.send("Reading Cookie");
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+    const decodeMessage = await jwt.verify(token, "Namaste@123");
+    const { _id } = decodeMessage;
+    const user = await User.findById(_id);
+    console.log(user, "user");
+    res.send(user);
   } catch (err) {
     res.status(400).send("Error while reading user: " + err.message);
   }
