@@ -1,5 +1,5 @@
 const express = require("express");
-const validateFunction = require("../utils/validate");
+const { validateFunction } = require("../utils/validate");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
@@ -12,7 +12,8 @@ authRouter.post("/signup", async (req, res) => {
     validateFunction(req);
 
     //Hashing of the password
-    const { firstName, emailId, password } = req.body;
+    const { firstName, lastName, emailId, password, age, gender, skills, bio } =
+      req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
     const existingUser = await User.findOne({ emailId });
@@ -23,8 +24,13 @@ authRouter.post("/signup", async (req, res) => {
     //creating a new instance of User model
     const user = new User({
       firstName,
+      lastName,
       emailId,
       password: passwordHash,
+      age,
+      gender,
+      skills,
+      bio,
     });
     await user.save();
     res.send("User Added Successfully");
@@ -58,5 +64,15 @@ authRouter.post("/login", async (req, res) => {
     res.status(400).send("Problem while Login in: " + err.message);
   }
 });
+
+//logout api
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+  });
+  res.send("Logout Successfully");
+});
+
+//
 
 module.exports = authRouter;

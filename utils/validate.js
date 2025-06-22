@@ -11,4 +11,19 @@ const validateFunction = (req) => {
   }
 };
 
-module.exports = validateFunction;
+const validateProfile = (req) => {
+  const allowedFields = [
+    "firstName",
+    "lastName",
+    "age",
+    "skills",
+    "bio",
+    "gender",
+  ];
+  const isEditAllowed = Object.keys(req.body).every((item) =>
+    allowedFields.includes(item)
+  );
+  return isEditAllowed;
+};
+
+module.exports = { validateFunction, validateProfile };
