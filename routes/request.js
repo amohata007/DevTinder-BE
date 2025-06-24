@@ -14,10 +14,12 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const status = req.params.status;
 
+      //FromUser is in format of Obj("id") so convert with .toString
       if (fromUserId.toString() === toUserId) {
         return res.status(400).json({ message: "Can't send to same person" });
       }
 
+      //Expensive query with large database so better to use index/Compound Index
       const toUserIdExist = await User.findOne({ _id: toUserId });
       if (!toUserIdExist) {
         return res.status(400).json({ message: "Invalid UserId" });
