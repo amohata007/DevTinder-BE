@@ -1,6 +1,7 @@
 const express = require("express");
 const { userAuth } = require("../Middlewares/admin");
 const connectionRequestModel = require("../models/requestConnection");
+const User = require("../models/user");
 const userRouter = express.Router();
 
 //Request Received APIs
@@ -63,6 +64,35 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
         : row.fromUserId
     );
     res.json({ message: "List of connections fetched.", data: data });
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+//feed
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const connectionRequest = await connectionRequestModel
+      .find({
+        $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }],
+      })
+      .select("fromUserId toUserId");
+
+    const blockUserFromFeed = new Set();
+    connectionRequest.forEach((req) => {
+      blockUserFromFeed.add(req.toUserId.toString());
+      blockUserFromFeed.add(req.fromUserId.toString());
+    });
+
+    const user = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(blockUserFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select(["firstName", "lastName", "gender", "skills", "age", "bio"]);
+
+    res.json({ message: "Feed Data", data: user });
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
