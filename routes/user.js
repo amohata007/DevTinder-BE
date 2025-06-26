@@ -29,4 +29,43 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   }
 });
 
+//Who are my Connections
+userRouter.get("/user/connection", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const allConnections = await connectionRequestModel
+      .find({
+        $or: [
+          { toUserId: loggedInUser._id, status: "accepted" },
+          { fromUserId: loggedInUser._id, status: "accepted" },
+        ],
+      })
+      .populate("fromUserId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "skills",
+        "age",
+        "bio",
+      ])
+      .populate("toUserId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "skills",
+        "age",
+        "bio",
+      ]);
+
+    const data = allConnections.map((row) =>
+      row.fromUserId._id.toString() === loggedInUser._id.toString()
+        ? row.toUserId
+        : row.fromUserId
+    );
+    res.json({ message: "List of connections fetched.", data: data });
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
 module.exports = userRouter;
