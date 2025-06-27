@@ -42,7 +42,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       validate(value) {
-        console.log(value);
         if (value !== "male" && value !== "female") {
           throw new Error("Invalid Gender");
         }
