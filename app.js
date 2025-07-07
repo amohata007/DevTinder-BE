@@ -6,8 +6,10 @@ const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
 const authRouter = require("./routes/auth.js");
 const userRouter = require("./routes/user.js");
+const cors = require("cors");
 
 //Converting into proper json format
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
